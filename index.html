@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>萌宠回家 - 猫狗公益领养平台 | 24215220204 李子涵</title>
+<style>
+/* ========== 全局重置与变量 ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+--primary: #e67e22;
+--primary-dark: #d35400;
+--secondary: #f39c12;
+--bg: #fdf6f0;
+--card-bg: #ffffff;
+--text: #333333;
+--text-light: #666666;
+--border: #e0e0e0;
+--radius: 12px;
+--shadow: 0 4px 20px rgba(0,0,0,0.08);
+--transition: all 0.3s ease;
+}
+body {
+font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+background: var(--bg);
+color: var(--text);
+line-height: 1.6;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+}
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+img { max-width: 100%; display: block; border-radius: var(--radius); }
+
+/* ========== 页面路由容器 ========== */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ========== 加载动画 ========== */
+.page-loader {
+position: fixed;
+inset: 0;
+background: rgba(255,255,255,0.95);
+z-index: 99999;
+display: none;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+}
+.page-loader.show { display: flex; }
+.loader-paw {
+font-size: 48px;
+animation: pawBounce 1s infinite;
+}
+@keyframes pawBounce {
+0%, 100% { transform: translateY(0) rotate(0deg); }
+50% { transform: translateY(-15px) rotate(10deg); }
+}
+.loader-text {
+margin-top: 16px;
+color: var(--primary);
+font-size: 16px;
+font-weight: 500;
+}
+
+/* ========== 导航栏 ========== */
+.navbar {
+background: #fff;
+box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+position: sticky;
+top: 0;
+z-index: 1000;
+}
+.nav-container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 20px;
+height: 64px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+.logo {
+font-size: 24px;
+font-weight: bold;
+color: var(--primary);
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.nav-links {
+display: flex;
+gap: 32px;
+align-items: center;
+}
+.nav-links a {
+font-size: 15px;
+color: var(--text);
+font-weight: 500;
+transition: var(--transition);
+position: relative;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--primary); }
+.nav-links a::after {
+content: '';
+position: absolute;
+bottom: -4px;
+left: 0;
+width: 0;
+height: 2px;
+background: var(--primary);
+transition: var(--transition);
+}
+.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+.nav-user {
+display: flex;
+gap: 12px;
+align-items: center;
+}
+.btn {
+padding: 8px 20px;
+border-radius: 20px;
+border: none;
+cursor: pointer;
+font-size: 14px;
+transition: var(--transition);
+display: inline-block;
+text-align: center;
+}
+.btn-primary {
+background: var(--primary);
+color: #fff;
+}
+.btn-primary:hover {
+background: var(--primary-dark);
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(230,126,34,0.3);
+}
+.btn-outline {
+background: transparent;
+color: var(--primary);
+border: 1.5px solid var(--primary);
+}
+.btn-outline:hover { background: var(--primary); color: #fff; }
+.btn-danger { background: #e74c3c; color: #fff; }
+.btn-danger:hover { background: #c0392b; }
+.btn-success { background: #27ae60; color: #fff; }
+.btn-success:hover { background: #1e8449; }
+.btn-sm { padding: 6px 14px; font-size: 13px; }
+.username-display { color: var(--primary); font-weight: 600; }
+
+/* ========== 页脚 ========== */
+.footer {
+background: #2c3e50;
+color: #ecf0f1;
+padding: 40px 20px 0;
+margin-top: auto;
+}
+.footer-content {
+max-width: 1200px;
+margin: 0 auto;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+gap: 30px;
+margin-bottom: 20px;
+}
+.footer h4 {
+color: var(--secondary);
+margin-bottom: 12px;
+font-size: 16px;
+}
+.footer p, .footer a {
+color: #bdc3c7;
+font-size: 14px;
+line-height: 2;
+}
+.footer-bottom {
+text-align: center;
+padding-top: 20px;
+border-top: 1px solid #34495e;
+font-size: 13px;
+color: #95a5a6;
+}
+
+/* ========== 学号信息横幅（醒目） ========== */
+.student-banner {
+background: linear-gradient(90deg, #1a252f 0%, #2c3e50 50%, #1a252f 100%);
+border-top: 3px solid var(--primary);
+padding: 18px 20px;
+text-align: center;
+position: relative;
+overflow: hidden;
+}
+.student-banner::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(230,126,34,0.15), transparent);
+animation: shimmer 3s infinite;
+}
+@keyframes shimmer {
+0% { left: -100%; }
+100% { left: 100%; }
+}
+.student-banner-content {
+position: relative;
+z-index: 1;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 24px;
+flex-wrap: wrap;
+}
+.student-banner-icon {
+font-size: 28px;
+color: var(--secondary);
+}
+.student-banner-text {
+color: #fff;
+font-size: 16px;
+font-weight: 600;
+letter-spacing: 1px;
+text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.student-banner-text .highlight {
+color: var(--secondary);
+font-size: 18px;
+font-weight: 700;
+}
+.student-banner-badge {
+background: var(--primary);
+color: #fff;
+padding: 4px 14px;
+border-radius: 20px;
+font-size: 13px;
+font-weight: 600;
+}
+
+/* ========== 轮播图 ========== */
+.carousel {
+position: relative;
+width: 100%;
+height: 480px;
+overflow: hidden;
+background: #333;
+}
+.carousel-slide {
+position: absolute;
+width: 100%;
+height: 100%;
+opacity: 0;
+transition: opacity 1s ease-in-out;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.carousel-slide.active { opacity: 1; }
+.carousel-slide img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+border-radius: 0;
+}
+.carousel-overlay {
+position: absolute;
+inset: 0;
+background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.2));
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+color: #fff;
+text-align: center;
+padding: 20px;
+}
+.carousel-overlay h2 {
+font-size: 42px;
+margin-bottom: 16px;
+text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+animation: fadeInUp 1s ease;
+}
+.carousel-overlay p {
+font-size: 18px;
+margin-bottom: 28px;
+max-width: 600px;
+animation: fadeInUp 1s ease 0.2s both;
+}
+@keyframes fadeInUp {
+from { opacity: 0; transform: translateY(30px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.carousel-btn {
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+background: rgba(255,255,255,0.25);
+border: none;
+color: #fff;
+width: 48px;
+height: 48px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: var(--transition);
+z-index: 10;
+}
+.carousel-btn:hover { background: rgba(255,255,255,0.45); }
+.carousel-prev { left: 20px; }
+.carousel-next { right: 20px; }
+.carousel-dots {
+position: absolute;
+bottom: 24px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: 10px;
+z-index: 10;
+}
+.carousel-dot {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: rgba(255,255,255,0.5);
+cursor: pointer;
+transition: var(--transition);
+}
+.carousel-dot.active { background: #fff; width: 28px; border-radius: 5px; }
+
+/* ========== 通用容器 ========== */
+.container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 20px;
+}
+.section-title {
+text-align: center;
+font-size: 28px;
+color: var(--text);
+margin: 50px 0 30px;
+position: relative;
+}
+.section-title::after {
+content: '';
+display: block;
+width: 60px;
+height: 4px;
+background: var(--primary);
+margin: 10px auto 0;
+border-radius: 2px;
+}
+
+/* ========== 搜索框 ========== */
+.search-box {
+display: flex;
+max-width: 600px;
+margin: 0 auto 40px;
+background: #fff;
+border-radius: 50px;
+box-shadow: var(--shadow);
+overflow: hidden;
+border: 2px solid var(--border);
+transition: var(--transition);
+}
+.search-box:focus-within {
+border-color: var(--primary);
+box-shadow: 0 4px 20px rgba(230,126,34,0.15);
+}
+.search-box input {
+flex: 1;
+border: none;
+padding: 14px 24px;
+font-size: 15px;
+outline: none;
+background: transparent;
+}
+.search-box button {
+background: var(--primary);
+color: #fff;
+border: none;
+padding: 0 28px;
+cursor: pointer;
+font-size: 16px;
+transition: var(--transition);
+}
+.search-box button:hover { background: var(--primary-dark); }
+
+/* ========== 分类入口 ========== */
+.category-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 24px;
+margin-bottom: 50px;
+}
+.category-card {
+position: relative;
+height: 200px;
+border-radius: var(--radius);
+overflow: hidden;
+cursor: pointer;
+box-shadow: var(--shadow);
+}
+.category-card img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: transform 0.5s ease;
+}
+.category-card:hover img { transform: scale(1.1); }
+.category-card span {
+position: absolute;
+inset: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+background: rgba(0,0,0,0.35);
+color: #fff;
+font-size: 24px;
+font-weight: bold;
+transition: var(--transition);
+}
+.category-card:hover span { background: rgba(0,0,0,0.5); }
+
+/* ========== 宠物卡片 ========== */
+.pet-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+gap: 24px;
+margin-bottom: 50px;
+}
+.pet-card {
+background: var(--card-bg);
+border-radius: var(--radius);
+overflow: hidden;
+box-shadow: var(--shadow);
+transition: var(--transition);
+cursor: pointer;
+position: relative;
+}
+.pet-card:hover {
+transform: translateY(-6px);
+box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+.pet-card-img {
+height: 220px;
+overflow: hidden;
+position: relative;
+}
+.pet-card-img img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: transform 0.4s ease;
+}
+.pet-card:hover .pet-card-img img { transform: scale(1.08); }
+.pet-tag {
+position: absolute;
+top: 12px;
+left: 12px;
+background: var(--primary);
+color: #fff;
+padding: 4px 12px;
+border-radius: 20px;
+font-size: 12px;
+font-weight: 600;
+}
+.pet-fav-btn {
+position: absolute;
+top: 12px;
+right: 12px;
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: rgba(255,255,255,0.9);
+border: none;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+transition: var(--transition);
+z-index: 5;
+}
+.pet-fav-btn:hover { transform: scale(1.1); background: #fff; }
+.pet-fav-btn.active { color: #e74c3c; }
+.pet-card-body { padding: 18px; }
+.pet-card-body h3 {
+font-size: 18px;
+margin-bottom: 8px;
+color: var(--text);
+}
+.pet-meta {
+display: flex;
+gap: 12px;
+font-size: 13px;
+color: var(--text-light);
+margin-bottom: 10px;
+flex-wrap: wrap;
+}
+.pet-meta span {
+background: #f5f5f5;
+padding: 3px 10px;
+border-radius: 12px;
+}
+.pet-desc {
+font-size: 14px;
+color: var(--text-light);
+line-height: 1.5;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+
+/* ========== 筛选栏 ========== */
+.filter-bar {
+background: #fff;
+padding: 20px;
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+margin-bottom: 30px;
+display: flex;
+flex-wrap: wrap;
+gap: 16px;
+align-items: center;
+}
+.filter-group {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.filter-group label {
+font-size: 14px;
+color: var(--text-light);
+font-weight: 500;
+}
+.filter-group select {
+padding: 8px 14px;
+border-radius: 8px;
+border: 1.5px solid var(--border);
+outline: none;
+font-size: 14px;
+cursor: pointer;
+transition: var(--transition);
+background: #fff;
+}
+.filter-group select:focus { border-color: var(--primary); }
+
+/* ========== 详情页 ========== */
+.detail-container {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 40px;
+margin: 40px auto;
+background: #fff;
+padding: 30px;
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+}
+.detail-img {
+border-radius: var(--radius);
+overflow: hidden;
+height: 450px;
+position: relative;
+}
+.detail-img img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+.detail-fav-btn {
+position: absolute;
+top: 16px;
+right: 16px;
+width: 44px;
+height: 44px;
+border-radius: 50%;
+background: rgba(255,255,255,0.95);
+border: none;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 22px;
+transition: var(--transition);
+box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.detail-fav-btn:hover { transform: scale(1.1); }
+.detail-fav-btn.active { color: #e74c3c; }
+.detail-info h1 {
+font-size: 28px;
+margin-bottom: 16px;
+color: var(--text);
+}
+.detail-tags {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+margin-bottom: 20px;
+}
+.detail-tag {
+background: #fff3e0;
+color: var(--primary-dark);
+padding: 6px 14px;
+border-radius: 20px;
+font-size: 13px;
+font-weight: 600;
+}
+.detail-section { margin-bottom: 24px; }
+.detail-section h3 {
+font-size: 18px;
+color: var(--primary-dark);
+margin-bottom: 10px;
+padding-bottom: 6px;
+border-bottom: 2px solid #ffe0b2;
+}
+.detail-section p {
+color: var(--text-light);
+font-size: 15px;
+line-height: 1.8;
+}
+.detail-actions {
+display: flex;
+gap: 16px;
+margin-top: 30px;
+flex-wrap: wrap;
+}
+
+/* ========== 表单页 ========== */
+.form-container {
+max-width: 520px;
+margin: 40px auto;
+background: #fff;
+padding: 40px;
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+}
+.form-container h2 {
+text-align: center;
+margin-bottom: 28px;
+color: var(--text);
+font-size: 26px;
+}
+.form-group { margin-bottom: 20px; }
+.form-group label {
+display: block;
+margin-bottom: 6px;
+font-size: 14px;
+color: var(--text);
+font-weight: 500;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+width: 100%;
+padding: 12px 16px;
+border: 1.5px solid var(--border);
+border-radius: 10px;
+font-size: 15px;
+transition: var(--transition);
+outline: none;
+font-family: inherit;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+border-color: var(--primary);
+box-shadow: 0 0 0 3px rgba(230,126,34,0.1);
+}
+.form-group textarea {
+resize: vertical;
+min-height: 100px;
+}
+.error-msg {
+color: #e74c3c;
+font-size: 13px;
+margin-top: 4px;
+display: none;
+}
+.form-group.error input,
+.form-group.error select,
+.form-group.error textarea { border-color: #e74c3c; }
+.form-group.error .error-msg { display: block; }
+.form-link {
+text-align: center;
+margin-top: 20px;
+font-size: 14px;
+color: var(--text-light);
+}
+.form-link a { color: var(--primary); font-weight: 600; }
+
+/* ========== 个人中心 ========== */
+.user-header {
+background: linear-gradient(135deg, var(--primary), var(--secondary));
+color: #fff;
+padding: 40px 20px;
+border-radius: var(--radius);
+margin: 30px auto;
+text-align: center;
+}
+.user-header h2 { font-size: 24px; margin-bottom: 8px; }
+.user-tabs {
+display: flex;
+gap: 8px;
+margin-bottom: 20px;
+border-bottom: 2px solid var(--border);
+}
+.user-tab {
+padding: 10px 24px;
+cursor: pointer;
+border-bottom: 3px solid transparent;
+font-weight: 500;
+color: var(--text-light);
+transition: var(--transition);
+}
+.user-tab:hover { color: var(--primary); }
+.user-tab.active {
+color: var(--primary);
+border-bottom-color: var(--primary);
+}
+.user-tab-panel { display: none; }
+.user-tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+.apply-list {
+background: #fff;
+padding: 24px;
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+margin-bottom: 40px;
+}
+.apply-item {
+display: flex;
+align-items: center;
+gap: 20px;
+padding: 16px 0;
+border-bottom: 1px solid var(--border);
+}
+.apply-item:last-child { border-bottom: none; }
+.apply-item img {
+width: 80px;
+height: 80px;
+object-fit: cover;
+border-radius: 8px;
+}
+.apply-info { flex: 1; }
+.apply-info h4 { font-size: 16px; margin-bottom: 4px; }
+.apply-info p { font-size: 13px; color: var(--text-light); }
+.apply-status {
+padding: 4px 14px;
+border-radius: 20px;
+font-size: 13px;
+font-weight: 600;
+}
+.status-pending { background: #fff3e0; color: var(--primary-dark); }
+.status-approved { background: #e8f5e9; color: #2e7d32; }
+
+/* 收藏列表 */
+.fav-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 20px;
+margin-bottom: 40px;
+}
+.fav-card {
+background: #fff;
+border-radius: var(--radius);
+overflow: hidden;
+box-shadow: var(--shadow);
+position: relative;
+}
+.fav-card img {
+width: 100%;
+height: 160px;
+object-fit: cover;
+}
+.fav-card-body {
+padding: 14px;
+}
+.fav-card-body h4 {
+font-size: 15px;
+margin-bottom: 6px;
+}
+.fav-card-body p {
+font-size: 12px;
+color: var(--text-light);
+}
+.fav-remove {
+position: absolute;
+top: 8px;
+right: 8px;
+width: 28px;
+height: 28px;
+border-radius: 50%;
+background: rgba(231,76,60,0.9);
+color: #fff;
+border: none;
+cursor: pointer;
+font-size: 16px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: var(--text-light);
+}
+.empty-state svg {
+width: 80px;
+height: 80px;
+margin-bottom: 16px;
+opacity: 0.4;
+}
+
+/* ========== 领养须知 ========== */
+.notice-section {
+background: #fff;
+padding: 40px;
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+margin-bottom: 50px;
+}
+.notice-section h3 {
+color: var(--primary-dark);
+margin-bottom: 20px;
+font-size: 22px;
+}
+.notice-section ul { padding-left: 20px; list-style: disc; }
+.notice-section li {
+margin-bottom: 12px;
+color: var(--text-light);
+line-height: 1.8;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+.nav-links { display: none; }
+.carousel { height: 320px; }
+.carousel-overlay h2 { font-size: 26px; }
+.detail-container { grid-template-columns: 1fr; }
+.pet-grid { grid-template-columns: 1fr; }
+.filter-bar { flex-direction: column; align-items: stretch; }
+.student-banner-content { flex-direction: column; gap: 8px; }
+}
+
+/* ========== Toast 提示 ========== */
+.toast {
+position: fixed;
+top: 80px;
+left: 50%;
+transform: translateX(-50%) translateY(-20px);
+background: #333;
+color: #fff;
+padding: 12px 28px;
+border-radius: 8px;
+font-size: 14px;
+opacity: 0;
+pointer-events: none;
+transition: all 0.3s ease;
+z-index: 9999;
+box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.toast.show {
+opacity: 1;
+transform: translateX(-50%) translateY(0);
+}
+
+/* ========== 加载动画 ========== */
+.spinner {
+display: inline-block;
+width: 20px;
+height: 20px;
+border: 2px solid rgba(255,255,255,0.3);
+border-radius: 50%;
+border-top-color: #fff;
+animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========== 统计面板 ========== */
+.stats-bar {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 20px;
+margin-bottom: 40px;
+}
+.stat-card {
+background: #fff;
+padding: 24px;
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+text-align: center;
+transition: var(--transition);
+}
+.stat-card:hover { transform: translateY(-4px); }
+.stat-card h4 {
+font-size: 32px;
+color: var(--primary);
+margin-bottom: 4px;
+}
+.stat-card p { color: var(--text-light); font-size: 14px; }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- ================= 页面加载动画 ================= -->
+<div class="page-loader" id="page-loader">
+<div class="loader-paw">🐾</div>
+<div class="loader-text">正在加载萌宠世界...</div>
+</div>
+
+<!-- ================= 导航栏 ================= -->
+<<nav class="navbar">
+<div class="nav-container">
+<a href="#home" class="logo">🐾 萌宠回家</a>
+<div class="nav-links">
+<a href="#home" class="active" data-route="home">首页</a>
+<a href="#list?type=dog" data-route="list">狗狗领养</a>
+<a href="#list?type=cat" data-route="list">猫咪领养</a>
+<a href="#home" onclick="scrollToNotice(event)">领养须知</a>
+<a href="#user" data-route="user">个人中心</a>
+</div>
+<div class="nav-user" id="nav-login-box">
+<a href="#login" class="btn btn-outline btn-sm">登录</a>
+<a href="#register" class="btn btn-primary btn-sm">注册</a>
+</div>
+<div class="nav-user" id="nav-user-box" style="display:none;">
+<span class="username-display"></span>
+<button class="btn btn-outline btn-sm" onclick="logout()">退出</button>
+</div>
+</div>
+</nav>
+
+<!-- ================= 首页 ================= -->
+<div id="page-home" class="page active">
+<div class="carousel" id="carousel">
+<div class="carousel-slide active">
+<img src="images/阿金.png" alt="banner1">
+<div class="carousel-overlay">
+<h2>给它一个家，让爱不再流浪</h2>
+<p>每一个生命都值得被温柔以待，领养代替购买，给流浪猫狗一个温暖的归宿</p>
+<a href="#list" class="btn btn-primary" style="padding:12px 36px;font-size:16px;">立即领养</a>
+</div>
+</div>
+<div class="carousel-slide">
+<img src="images/豆豆.png" alt="banner2">
+<div class="carousel-overlay">
+<h2>用领养传递爱</h2>
+<p>加入我们的公益领养行动，让更多毛孩子找到属于自己的家人</p>
+<a href="#list" class="btn btn-primary" style="padding:12px 36px;font-size:16px;">浏览宠物</a>
+</div>
+</div>
+<div class="carousel-slide">
+<img src="images/布布.png" alt="banner3">
+<div class="carousel-overlay">
+<h2>科学养宠，责任相伴</h2>
+<p>领养前请确认您有足够的时间、精力和经济能力照顾它的一生</p>
+<a href="#home" onclick="scrollToNotice(event)" class="btn btn-primary" style="padding:12px 36px;font-size:16px;">了解须知</a>
+</div>
+</div>
+<button class="carousel-btn carousel-prev" onclick="changeSlide(-1)">◀</button>
+<button class="carousel-btn carousel-next" onclick="changeSlide(1)">▶</button>
+<div class="carousel-dots">
+<span class="carousel-dot active" onclick="goToSlide(0)"></span>
+<span class="carousel-dot" onclick="goToSlide(1)"></span>
+<span class="carousel-dot" onclick="goToSlide(2)"></span>
+</div>
+</div>
+<div class="container" style="margin-top:40px;">
+<form class="search-box" onsubmit="return doSearch()">
+<input type="text" id="home-search" placeholder="搜索宠物名字、品种，例如：金毛、布偶...">
+<button type="submit">🔍 搜索</button>
+</form>
+</div>
+<div class="container">
+<h2 class="section-title">快速分类</h2>
+<div class="category-grid">
+<div class="category-card" onclick="location.hash='list?type=dog'">
+<img src="images/豆豆.png" alt="狗狗">
+<span>🐕 狗狗专区</span>
+</div>
+<div class="category-card" onclick="location.hash='list?type=cat'">
+<img src="images/布布.png" alt="猫咪">
+<span>🐈 猫咪专区</span>
+</div>
+</div>
+</div>
+<div class="container">
+<h2 class="section-title">平台数据</h2>
+<div class="stats-bar">
+<div class="stat-card"><h4 id="stat-total">60</h4><p>待领养宠物</p></div>
+<div class="stat-card"><h4 id="stat-dog">30</h4><p>狗狗数量</p></div>
+<div class="stat-card"><h4 id="stat-cat">30</h4><p>猫咪数量</p></div>
+<div class="stat-card"><h4 id="stat-apply">0</h4><p>累计申请</p></div>
+<div class="stat-card"><h4 id="stat-fav">0</h4><p>累计收藏</p></div>
+</div>
+</div>
+<div class="container">
+<h2 class="section-title">热门待领养</h2>
+<div class="pet-grid" id="hot-pets"></div>
+</div>
+<div class="container" id="notice">
+<div class="notice-section">
+<h3>📋 领养须知</h3>
+<ul>
+<li><strong>年龄要求：</strong>领养人需年满22周岁，有独立经济来源和固定住所。</li>
+<li><strong>家庭同意：</strong>领养需征得全家人同意，不可因结婚、生育、搬家等原因遗弃。</li>
+<li><strong>科学喂养：</strong>必须喂养正规品牌粮，定期驱虫、接种疫苗，适龄绝育。</li>
+<li><strong>接受回访：</strong>领养后需接受救助站不定期回访，配合上传宠物近况。</li>
+<li><strong>责任终身：</strong>猫狗寿命约10-15年，请确认能照顾它的一生，不因任何理由转送或弃养。</li>
+<li><strong>手续办理：</strong>需携带身份证件签署领养协议，留真实联系方式和住址。</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- ================= 宠物列表页 ================= -->
+<div id="page-list" class="page">
+<div class="container" style="margin-top:30px;">
+<h2 class="section-title">待领养宠物</h2>
+<div class="filter-bar">
+<div class="filter-group">
+<label>宠物类型</label>
+<select id="filter-type" onchange="renderList()">
+<option value="">全部</option>
+<option value="dog">狗狗</option>
+<option value="cat">猫咪</option>
+</select>
+</div>
+<div class="filter-group">
+<label>品种</label>
+<select id="filter-breed" onchange="renderList()">
+<option value="">全部品种</option>
+</select>
+</div>
+<div class="filter-group">
+<label>年龄</label>
+<select id="filter-age" onchange="renderList()">
+<option value="">全部</option>
+<option value="幼年">幼年（<<1岁）</option>
+<option value="成年">成年（1-7岁）</option>
+<option value="老年">老年（>7岁）</option>
+</select>
+</div>
+<div class="filter-group">
+<label>性别</label>
+<select id="filter-gender" onchange="renderList()">
+<option value="">全部</option>
+<option value="公">公</option>
+<option value="母">母</option>
+</select>
+</div>
+<div class="filter-group">
+<label>绝育</label>
+<select id="filter-sterilized" onchange="renderList()">
+<option value="">全部</option>
+<option value="true">已绝育</option>
+<option value="false">未绝育</option>
+</select>
+</div>
+<div class="filter-group" style="margin-left:auto;">
+<input type="text" id="filter-keyword" placeholder="搜索名字/品种" style="padding:8px 14px;border-radius:8px;border:1.5px solid #e0e0e0;outline:none;" onkeyup="if(event.key==='Enter') renderList()">
+<button class="btn btn-primary btn-sm" onclick="renderList()">搜索</button>
+<button class="btn btn-outline btn-sm" onclick="resetFilter()">重置</button>
+</div>
+</div>
+<div class="pet-grid" id="pet-list"></div>
+<div id="empty-tip" class="empty-state" style="display:none;">
+<p style="font-size:18px;">😿 没有找到符合条件的宠物</p>
+<p>试试调整筛选条件吧</p>
+</div>
+</div>
+</div>
+
+<!-- ================= 宠物详情页 ================= -->
+<div id="page-detail" class="page">
+<div class="container">
+<div class="detail-container" id="detail-box"></div>
+</div>
+</div>
+
+<!-- ================= 登录页 ================= -->
+<div id="page-login" class="page">
+<div class="form-container">
+<h2>🔐 用户登录</h2>
+<form id="loginForm" onsubmit="return handleLogin()">
+<div class="form-group" id="fg-user">
+<label>用户名</label>
+<input type="text" id="username" placeholder="请输入用户名">
+<div class="error-msg">用户名不能为空</div>
+</div>
+<div class="form-group" id="fg-pwd">
+<label>登录密码</label>
+<input type="password" id="password" placeholder="请输入密码（至少6位）">
+<div class="error-msg">密码不能为空且至少6位</div>
+</div>
+<button type="submit" class="btn btn-primary" style="width:100%;padding:12px;">立即登录</button>
+</form>
+<div class="form-link">
+还没有账号？<<a href="#register">立即注册</a>
+</div>
+</div>
+</div>
+
+<!-- ================= 注册页 ================= -->
+<div id="page-register" class="page">
+<div class="form-container">
+<h2>📝 注册账号</h2>
+<form id="regForm" onsubmit="return handleRegister()">
+<div class="form-group" id="fg-reg-user">
+<label>用户名</label>
+<input type="text" id="reg-user" placeholder="设置用户名（2-16位）">
+<div class="error-msg">用户名不能为空（2-16位）</div>
+</div>
+<div class="form-group" id="fg-reg-pwd">
+<label>登录密码</label>
+<input type="password" id="reg-pwd" placeholder="设置密码（至少6位）">
+<div class="error-msg">密码至少6位</div>
+</div>
+<div class="form-group" id="fg-reg-pwd2">
+<label>确认密码</label>
+<input type="password" id="reg-pwd2" placeholder="再次输入密码">
+<div class="error-msg">两次密码不一致</div>
+</div>
+<div class="form-group" id="fg-reg-phone">
+<label>联系电话</label>
+<input type="text" id="reg-phone" placeholder="11位手机号">
+<div class="error-msg">请输入正确的11位手机号</div>
+</div>
+<button type="submit" class="btn btn-primary" style="width:100%;padding:12px;">注册账号</button>
+</form>
+<div class="form-link">
+已有账号？<<a href="#login">立即登录</a>
+</div>
+</div>
+</div>
+
+<!-- ================= 领养申请页 ================= -->
+<div id="page-apply" class="page">
+<div class="container" style="margin-top:30px;">
+<div class="form-container" style="max-width:640px;">
+<h2>📋 领养申请表</h2>
+<div id="pet-info-bar" style="background:#fff3e0;padding:14px 18px;border-radius:10px;margin-bottom:24px;display:flex;align-items:center;gap:14px;"></div>
+<form id="applyForm" onsubmit="return handleApply()">
+<div class="form-group" id="fg-name">
+<label>申请人姓名 *</label>
+<input type="text" id="a-name" placeholder="真实姓名">
+<div class="error-msg">请输入姓名</div>
+</div>
+<div class="form-group" id="fg-phone">
+<label>联系电话 *</label>
+<input type="text" id="a-phone" placeholder="11位手机号">
+<div class="error-msg">请输入正确的手机号</div>
+</div>
+<div class="form-group" id="fg-address">
+<label>居住地址 *</label>
+<input type="text" id="a-address" placeholder="省市区 + 详细地址">
+<div class="error-msg">请输入详细居住地址</div>
+</div>
+<div class="form-group" id="fg-job">
+<label>职业身份 *</label>
+<select id="a-job">
+<option value="">请选择</option>
+<option value="上班族">上班族</option>
+<option value="学生">学生</option>
+<option value="自由职业">自由职业</option>
+<option value="退休">退休</option>
+<option value="其他">其他</option>
+</select>
+<div class="error-msg">请选择职业身份</div>
+</div>
+<div class="form-group" id="fg-house">
+<label>住房类型 *</label>
+<select id="a-house">
+<option value="">请选择</option>
+<option value="自购房">自购房</option>
+<option value="租房">租房</option>
+<option value="宿舍">宿舍</option>
+<option value="与父母同住">与父母同住</option>
+</select>
+<div class="error-msg">请选择住房类型</div>
+</div>
+<div class="form-group" id="fg-exp">
+<label>是否有养宠经验 *</label>
+<select id="a-exp">
+<option value="">请选择</option>
+<option value="有">有养宠经验</option>
+<option value="无">无养宠经验</option>
+</select>
+<div class="error-msg">请选择是否有养宠经验</div>
+</div>
+<div class="form-group" id="fg-reason">
+<label>领养理由 *</label>
+<<textarea id="a-reason" placeholder="请简述您的领养理由和养宠计划..."></textarea>
+<div class="error-msg">请填写领养理由（至少10个字）</div>
+</div>
+<button type="submit" class="btn btn-primary" style="width:100%;padding:12px;">提交申请</button>
+</form>
+</div>
+</div>
+</div>
+
+<!-- ================= 个人中心页 ================= -->
+<div id="page-user" class="page">
+<div class="container" style="margin-top:30px;">
+<div class="user-header">
+<h2>👤 我的个人中心</h2>
+<p id="user-welcome">欢迎回来</p>
+</div>
+<div class="user-tabs">
+<div class="user-tab active" onclick="switchTab('apply')" id="tab-apply">📋 领养申请</div>
+<div class="user-tab" onclick="switchTab('fav')" id="tab-fav">❤️ 我的收藏</div>
+</div>
+<div class="user-tab-panel active" id="panel-apply">
+<div class="apply-list" id="apply-list"></div>
+</div>
+<div class="user-tab-panel" id="panel-fav">
+<div id="fav-list"></div>
+</div>
+</div>
+</div>
+
+<!-- ================= 页脚 ================= -->
+<<footer class="footer">
+<div class="footer-content">
+<div>
+<h4>关于萌宠回家</h4>
+<p>专注流浪猫狗公益领养</p>
+<p>让每一只毛孩子都有家可归</p>
+</div>
+<div>
+<h4>联系我们</h4>
+<p>邮箱：adopt@mengchong.com</p>
+<p>电话：020-88886666</p>
+</div>
+<div>
+<h4>友情链接</h4>
+<p><a href="#">中国小动物保护协会</a></p>
+<p><a href="#">领养代替购买联盟</a></p>
+</div>
+</div>
+<div class="footer-bottom">
+<p>萌宠回家公益领养平台 | 版权所有 © 2026</p>
+</div>
+</footer>
+
+<!-- ================= 学号信息醒目横幅 ================= -->
+<div class="student-banner">
+<div class="student-banner-content">
+<div class="student-banner-icon">🎓</div>
+<div class="student-banner-text">
+<span class="highlight">广东东软学院</span>
+| 学号：<span class="highlight">24215220204</span>
+| 姓名：<span class="highlight">李子涵</span>
+| 班级：<span class="highlight">24网络2班</span>
+</div>
+<div class="student-banner-badge">Web编程技术 大作业</div>
+</div>
+</div>
+
+<!-- ================= JavaScript ================= -->
+<script>
+// ================= 60只宠物完整模拟数据 =================
+const PET_DATA = [
+// ===== 猫咪：英国短毛猫 =====
+{ id: 1, name: "蓝小胖", type: "cat", breed: "英国短毛猫", age: "1岁", gender: "公", sterilized: false, vaccinated: true, image: "images/蓝小胖.png", description: "性格温顺安静，不吵不闹，喜欢趴在身边陪伴，居家乖巧，新手好养。", story: "小区走失宠物猫，性格亲人，饮食规律，身体健康。", requirements: "固定住所、室内饲养、不弃养、接受回访。", location: "广州天河" },
+{ id: 2, name: "银点点", type: "cat", breed: "英国短毛猫", age: "1岁2个月", gender: "母", sterilized: true, vaccinated: false, image: "images/银点点.png", description: "温柔文静，胆子较小，粘人爱撒娇，适应环境快。", story: "被主人弃养，救助后慢慢变得亲人温顺。", requirements: "有耐心照顾，愿意后期补打疫苗，小封闭饲养。", location: "广州海珠" },
+{ id: 3, name: "煤球英短", type: "cat", breed: "英国短毛猫", age: "1岁半", gender: "公", sterilized: false, vaccinated: false, image: "images/煤球英短.png", description: "憨厚呆萌，不爱折腾，性格佛系，适合安静家庭。", story: "街边流浪被救助，体质很好，不挑食。", requirements: "适龄愿意绝育、补疫苗，室内不散养。", location: "广州白云" },
+
+// ===== 猫咪：美国短毛猫 =====
+{ id: 4, name: "美短", type: "cat", breed: "美国短毛猫", age: "1岁半", gender: "母", sterilized: true, vaccinated: false, image: "images/美短.png", description: "活泼聪明，体质健壮，亲人不怕生，适合有小孩家庭。", story: "户外流浪被救助，调养后身体健康性格开朗。", requirements: "定期驱虫补疫苗，不离不弃。", location: "广州越秀" },
+{ id: 5, name: "阿斑", type: "cat", breed: "美国短毛猫", age: "1岁", gender: "公", sterilized: false, vaccinated: true, image: "images/阿斑.png", description: "机灵好动，好奇心强，互动性高，非常亲人。", story: "搬家被遗弃，习惯良好，听话懂事。", requirements: "小封闭阳台，室内饲养，适龄绝育。", location: "广州番禺" },
+{ id: 6, name: "朵朵美短", type: "cat", breed: "美国短毛猫", age: "6岁", gender: "母", sterilized: true, vaccinated: true, image: "images/朵朵美短.png", description: "性格沉稳温柔，不爱乱叫，很会陪伴主人。", story: "个人繁育退养，性格稳定健康无病。", requirements: "有责任心，长期饲养不转送。", location: "广州荔湾" },
+
+// ===== 猫咪：布偶猫 =====
+{ id: 7, name: "布布", type: "cat", breed: "布偶猫", age: "9岁", gender: "母", sterilized: true, vaccinated: true, image: "images/布布.png", description: "长毛蓝眼，温柔软糯，脾气极好，喜欢贴贴撒娇。", story: "主人无力饲养退养，品相优秀性格温顺。", requirements: "稳定收入，会打理长毛，接受回访。", location: "广州天河" },
+{ id: 8, name: "仙女", type: "cat", breed: "布偶猫", age: "5岁8个月", gender: "母", sterilized: false, vaccinated: true, image: "images/仙女.png", description: "气质优雅，性格软萌，粘人安静，颜值超高。", story: "走丢后被救助，性格亲人胆子不大。", requirements: "耐心呵护，适龄安排绝育。", location: "广州黄埔" },
+{ id: 9, name: "雪球布偶", type: "cat", breed: "布偶猫", age: "1岁", gender: "公", sterilized: false, vaccinated: false, image: "images/雪球布偶.png", description: "活泼温柔，亲人亲近，适应居家生活。", story: "繁育淘汰被救助，性格乖巧听话。", requirements: "愿意后期补疫苗、做绝育。", location: "广州花都" },
+
+// ===== 猫咪：暹罗猫 =====
+{ id: 10, name: "阿暹", type: "cat", breed: "暹罗猫", age: "1岁", gender: "公", sterilized: false, vaccinated: false, image: "images/阿暹.png", description: "性格外向话痨，智商高，粘人爱互动。", story: "街边流浪小猫，活泼好动身体健康。", requirements: "愿意补疫苗绝育，室内饲养。", location: "广州番禺" },
+{ id: 11, name: "小黑脸", type: "cat", breed: "暹罗猫", age: "1岁3个月", gender: "母", sterilized: true, vaccinated: true, image: "images/小黑脸.png", description: "叫声温柔，性格懂事，认主粘人，适应力强。", story: "宠物走失被收留，习惯良好。", requirements: "不弃养，小封闭饲养。", location: "广州海珠" },
+{ id: 12, name: "甜甜暹罗", type: "cat", breed: "暹罗猫", age: "1岁半", gender: "公", sterilized: false, vaccinated: true, image: "images/甜甜暹罗.png", description: "调皮可爱，好奇心重，非常喜欢跟人玩。", story: "主人出国弃养，性格开朗亲人。", requirements: "有时间陪伴，不笼养。", location: "广州白云" },
+
+// ===== 猫咪：波斯猫 =====
+{ id: 13, name: "波斯小公主", type: "cat", breed: "波斯猫", age: "10岁", gender: "母", sterilized: true, vaccinated: false, image: "images/波斯小公主.png", description: "长毛优雅，性格安静内敛，适合安静居家环境。", story: "长期流浪被救助，慢慢变得温顺亲人。", requirements: "会打理长毛，愿意补全疫苗。", location: "广州荔湾" },
+{ id: 14, name: "毛毛", type: "cat", breed: "波斯猫", age: "2岁半", gender: "公", sterilized: false, vaccinated: true, image: "images/毛毛.png", description: "性格慵懒高冷，举止优雅，不爱吵闹。", story: "家庭无力饲养退养，身体健康。", requirements: "生活环境安静，耐心养护。", location: "广州越秀" },
+{ id: 15, name: "大毛", type: "cat", breed: "波斯猫", age: "3岁半", gender: "母", sterilized: true, vaccinated: true, image: "images/大毛.png", description: "温顺稳重，性格成熟，很好相处。", story: "救助站收留多年，性格稳定乖巧。", requirements: "不离不弃，接受定期回访。", location: "广州天河" },
+
+// ===== 猫咪：异国短毛猫（加菲猫） =====
+{ id: 16, name: "圆圆", type: "cat", breed: "异国短毛猫", age: "2岁", gender: "公", sterilized: false, vaccinated: true, image: "images/圆圆.png", description: "圆脸扁鼻，慵懒佛系，安静乖巧不爱乱跑。", story: "个人繁育弃养，饮食习惯规律。", requirements: "室内小封闭饲养，适龄绝育。", location: "广州天河" },
+{ id: 17, name: "胖加菲", type: "cat", breed: "异国短毛猫", age: "1岁7个月", gender: "母", sterilized: true, vaccinated: false, image: "images/胖加菲.png", description: "呆萌温顺，性格软糯，很会撒娇。", story: "被主人闲置，救助后性格变好。", requirements: "后期补疫苗，细心喂养。", location: "广州番禺" },
+{ id: 18, name: "嘟嘟", type: "cat", breed: "异国短毛猫", age: "2岁2个月", gender: "公", sterilized: false, vaccinated: false, image: "images/嘟嘟.png", description: "憨厚安静，不爱折腾，适合独居人士饲养。", story: "路边捡到救助，体质好不挑食。", requirements: "愿意做绝育和补疫苗。", location: "广州海珠" },
+
+// ===== 猫咪：苏格兰折耳猫 =====
+{ id: 19, name: "小耳", type: "cat", breed: "苏格兰折耳猫", age: "1岁半", gender: "母", sterilized: true, vaccinated: true, image: "images/小耳.png", description: "性情温和，叫声轻柔，软萌粘人适合陪伴。", story: "家庭弃养，适应能力强很好养活。", requirements: "有爱心耐心，不散养。", location: "广州白云" },
+{ id: 20, name: "折折", type: "cat", breed: "苏格兰折耳猫", age: "1岁4个月", gender: "公", sterilized: false, vaccinated: true, image: "images/折折.png", description: "乖巧文静，胆子温柔，喜欢赖在主人身边。", story: "搬家被遗弃，性格稳定亲人。", requirements: "小封闭阳台，科学喂养。", location: "广州黄埔" },
+{ id: 21, name: "糯糯", type: "cat", breed: "苏格兰折耳猫", age: "8岁", gender: "母", sterilized: true, vaccinated: false, image: "images/糯糯.png", description: "性格腼腆温顺，懂事听话，安静不扰民。", story: "流浪救助后调养恢复健康。", requirements: "愿意补全疫苗，不弃养。", location: "广州荔湾" },
+
+// ===== 猫咪：缅因猫 =====
+{ id: 22, name: "缅缅", type: "cat", breed: "缅因猫", age: "2岁", gender: "公", sterilized: false, vaccinated: false, image: "images/缅缅.png", description: "体型大性格温柔，稳重亲人，脾气包容度高。", story: "走失被救助，胆子大不怕生。", requirements: "居住空间足，后期补疫苗绝育。", location: "广州黄埔" },
+{ id: 23, name: "温柔巨人", type: "cat", breed: "缅因猫", age: "2岁3个月", gender: "公", sterilized: true, vaccinated: true, image: "images/温柔巨人.png", description: "外表霸气内心温柔，待人友好，适合家庭饲养。", story: "主人无法继续饲养退养。", requirements: "有经济能力，耐心打理长毛。", location: "广州天河" },
+{ id: 24, name: "大猫仔", type: "cat", breed: "缅因猫", age: "1岁10个月", gender: "母", sterilized: false, vaccinated: true, image: "images/大猫仔.png", description: "活泼大方，性格稳定，亲近人不怕小。", story: "野外流浪被救助，体质强壮。", requirements: "室内饲养，适龄绝育。", location: "广州花都" },
+
+// ===== 猫咪：橘猫（中华田园猫） =====
+{ id: 25, name: "大橘", type: "cat", breed: "橘猫", age: "8岁", gender: "公", sterilized: true, vaccinated: true, image: "images/大橘.png", description: "不挑食体质好，性格开朗亲人，超好养活。", story: "校园流浪猫救助，性格随和无病。", requirements: "室内饲养，不放养不离不弃。", location: "广州天河" },
+{ id: 26, name: "橘胖子", type: "cat", breed: "橘猫", age: "1岁2个月", gender: "公", sterilized: false, vaccinated: false, image: "images/橘胖子.png", description: "憨厚贪吃，性格温顺，听话懂事。", story: "小区流浪被好心人收留。", requirements: "愿意补疫苗、适龄绝育。", location: "广州海珠" },
+{ id: 27, name: "小橘子", type: "cat", breed: "橘猫", age: "1岁半", gender: "母", sterilized: true, vaccinated: false, image: "images/小橘子.png", description: "乖巧安静，适应力强，家养非常合适。", story: "街边流浪救助，身体健康。", requirements: "小封闭饲养，定期驱虫疫苗。", location: "广州白云" },
+
+// ===== 猫咪：三花猫 =====
+{ id: 28, name: "花花", type: "cat", breed: "三花猫", age: "1岁半", gender: "母", sterilized: true, vaccinated: false, image: "images/花花.png", description: "懂事温顺，心思细腻，安静乖巧适合独居。", story: "路边流浪救助，性格稳定不吵闹。", requirements: "有责任心，愿意补全疫苗。", location: "广州海珠" },
+{ id: 29, name: "三花小宝", type: "cat", breed: "三花猫", age: "1岁3个月", gender: "母", sterilized: false, vaccinated: true, image: "images/三花小宝.png", description: "温柔亲人，略带腼腆，听话好管教。", story: "母猫带崽被救助，性格温顺。", requirements: "室内小封闭饲养，适龄绝育。", location: "广州番禺" },
+{ id: 30, name: "朵朵三花", type: "cat", breed: "三花猫", age: "2岁", gender: "母", sterilized: true, vaccinated: true, image: "images/朵朵三花.png", description: "性格稳重安静，不拆家不乱叫，非常省心。", story: "救助站长期照料，习惯良好。", requirements: "长期饲养，接受简单回访。", location: "广州越秀" },
+
+// ===== 狗狗：金毛寻回犬 =====
+{ id: 31, name: "阿金", type: "dog", breed: "金毛寻回犬", age: "9岁", gender: "公", sterilized: true, vaccinated: true, image: "images/阿金.png", description: "温顺暖心无攻击性，待人友善，适合有小孩家庭。", story: "走失流浪被救助，会简单随行。", requirements: "固定住所，每天保证遛狗时间。", location: "广州天河" },
+{ id: 32, name: "豆豆", type: "dog", breed: "金毛寻回犬", age: "1岁9个月", gender: "母", sterilized: false, vaccinated: true, image: "images/豆豆.png", description: "乖巧听话，性格温柔，亲人懂事服从性好。", story: "主人搬家弃养，性格稳定温顺。", requirements: "城市合规饲养，适龄绝育。", location: "广州番禺" },
+{ id: 33, name: "大金", type: "dog", breed: "金毛寻回犬", age: "2岁半", gender: "公", sterilized: true, vaccinated: false, image: "images/大金.png", description: "性格开朗热情，亲近陌生人，陪伴感强。", story: "流浪调养后恢复健康，性格温顺。", requirements: "愿意后期补疫苗，不弃养。", location: "广州白云" },
+
+// ===== 狗狗：拉布拉多 =====
+{ id: 34, name: "拉拉", type: "dog", breed: "拉布拉多", age: "1岁半", gender: "母", sterilized: false, vaccinated: true, image: "images/拉拉.png", description: "沉稳听话易训练，脾气好，优秀陪伴犬。", story: "主人无力饲养退养，适应力强。", requirements: "每日户外散步，适龄绝育。", location: "广州番禺" },
+{ id: 35, name: "布拉", type: "dog", breed: "拉布拉多", age: "2岁", gender: "公", sterilized: true, vaccinated: false, image: "images/布拉.png", description: "憨厚稳重，安静不闹腾，适合家养。", story: "流浪被救助，性格乖巧不拆家。", requirements: "有耐心养护，补全疫苗。", location: "广州海珠" },
+{ id: 36, name: "小拉", type: "dog", breed: "拉布拉多", age: "1岁4个月", gender: "母", sterilized: false, vaccinated: false, image: "images/小拉.png", description: "活泼温顺，聪明好学，容易教指令。", story: "走丢被捡到，亲人乖巧。", requirements: "有时间陪伴训练，补疫苗绝育。", location: "广州黄埔" },
+
+// ===== 狗狗：哈士奇 =====
+{ id: 37, name: "二哈", type: "dog", breed: "哈士奇", age: "2岁", gender: "公", sterilized: false, vaccinated: false, image: "images/二哈.png", description: "外形帅气，活泼好动，精力旺盛爱跑爱闹。", story: "走丢流浪被救助，互动性强。", requirements: "空间大，有耐心，后期补疫苗绝育。", location: "广州白云" },
+{ id: 38, name: "奇奇", type: "dog", breed: "哈士奇", age: "1岁10个月", gender: "公", sterilized: false, vaccinated: true, image: "images/奇奇.png", description: "性格友善爱笑，调皮可爱，无攻击性。", story: "主人工作忙弃养，性格开朗。", requirements: "能接受活泼性格，不散养。", location: "广州花都" },
+{ id: 39, name: "哈宝", type: "dog", breed: "哈士奇", age: "2岁3个月", gender: "母", sterilized: true, vaccinated: false, image: "images/哈宝.png", description: "颜值高性格温顺，比一般二哈安静稳重。", story: "繁育淘汰被救助，听话懂事。", requirements: "愿意补全疫苗，耐心饲养。", location: "广州天河" },
+
+// ===== 狗狗：萨摩耶 =====
+{ id: 40, name: "小白", type: "dog", breed: "萨摩耶", age: "1岁", gender: "母", sterilized: true, vaccinated: false, image: "images/小白.png", description: "微笑颜值高，温顺活泼，粘人可爱。", story: "个人弃养，性格乖巧习惯好。", requirements: "能打理白毛，愿意补疫苗。", location: "广州越秀" },
+{ id: 41, name: "萨萨", type: "dog", breed: "萨摩耶", age: "1岁2个月", gender: "母", sterilized: false, vaccinated: true, image: "images/萨萨.png", description: "开朗亲人，性格软萌，经常会撒娇。", story: "流浪被救助，恢复后健康亲人。", requirements: "每天遛弯，适龄绝育。", location: "广州荔湾" },
+{ id: 42, name: "雪球", type: "dog", breed: "萨摩耶", age: "1岁7个月", gender: "公", sterilized: true, vaccinated: true, image: "images/雪球.png", description: "长相甜美，性格稳重，安静不乱叫。", story: "走失被收留，服从性不错。", requirements: "有责任心，长期饲养不弃养。", location: "广州番禺" },
+
+// ===== 狗狗：柯基犬 =====
+{ id: 43, name: "小短腿", type: "dog", breed: "柯基犬", age: "1岁半", gender: "公", sterilized: true, vaccinated: true, image: "images/小短腿.png", description: "小短腿高颜值，开朗粘人，适合城市家养。", story: "家庭无法饲养退养，乖巧懂事。", requirements: "楼房可养，控制体重多运动。", location: "广州海珠" },
+{ id: 44, name: "基基", type: "dog", breed: "柯基犬", age: "1岁3个月", gender: "母", sterilized: false, vaccinated: true, image: "images/基基.png", description: "活泼调皮，性格温顺，待人友好。", story: "搬家被遗弃，性格稳定亲人。", requirements: "适龄做绝育，日常规律遛狗。", location: "广州天河" },
+{ id: 45, name: "柯小宝", type: "dog", breed: "柯基犬", age: "2岁", gender: "公", sterilized: false, vaccinated: false, image: "images/柯小宝.png", description: "呆萌可爱，听话懂事，不怎么拆家。", story: "路边捡到救助，体质健康。", requirements: "愿意补疫苗、后期绝育。", location: "广州白云" },
+
+// ===== 狗狗：泰迪（贵宾犬） =====
+{ id: 46, name: "泰泰", type: "dog", breed: "泰迪", age: "2岁", gender: "母", sterilized: false, vaccinated: true, image: "images/泰泰.png", description: "聪明不掉毛，体型小巧，适合公寓饲养。", story: "流浪被好心人捡到，粘人懂事。", requirements: "定期美容，适龄绝育。", location: "广州天河" },
+{ id: 47, name: "贵宾小宝", type: "dog", breed: "泰迪", age: "1岁6个月", gender: "母", sterilized: true, vaccinated: false, image: "images/贵宾小宝.png", description: "机灵乖巧，察言观色，性格温顺安静。", story: "繁育淘汰救助，性格软萌。", requirements: "室内饲养，补全疫苗。", location: "广州越秀" },
+{ id: 48, name: "豆豆泰迪", type: "dog", breed: "泰迪", age: "2岁1个月", gender: "公", sterilized: false, vaccinated: false, image: "images/豆豆泰迪.png", description: "聪明活泼，亲近主人，体型小巧好打理。", story: "主人弃养，习惯定点大小便。", requirements: "有耐心教导，后期疫苗绝育。", location: "广州番禺" },
+
+// ===== 狗狗：比熊犬 =====
+{ id: 49, name: "熊熊", type: "dog", breed: "比熊犬", age: "1岁", gender: "公", sterilized: true, vaccinated: false, image: "images/熊熊.png", description: "毛发蓬松，温顺粘人，安静不爱乱叫。", story: "繁育淘汰弃养，性格软糯亲人。", requirements: "会打理毛发，愿意补疫苗。", location: "广州荔湾" },
+{ id: 50, name: "小白熊", type: "dog", breed: "比熊犬", age: "1岁2个月", gender: "母", sterilized: false, vaccinated: true, image: "images/小白熊.png", description: "可爱呆萌，性格乖巧，非常适合陪伴。", story: "走丢被救助，身体健康听话。", requirements: "定期美容，适龄绝育。", location: "广州海珠" },
+{ id: 51, name: "团子", type: "dog", breed: "比熊犬", age: "1岁8个月", gender: "公", sterilized: true, vaccinated: true, image: "images/团子.png", description: "性格稳重温柔，亲人友善，很好相处。", story: "家庭退养，性格稳定无坏习惯。", requirements: "不离不弃，接受回访。", location: "广州白云" },
+
+// ===== 狗狗：边境牧羊犬 =====
+{ id: 52, name: "边边", type: "dog", breed: "边境牧羊犬", age: "2岁", gender: "公", sterilized: false, vaccinated: false, image: "images/边边.png", description: "智商超高，听话懂事，学习能力超强。", story: "走失流浪救助，服从性很好。", requirements: "有时间陪伴训练，补疫苗绝育。", location: "广州黄埔" },
+{ id: 53, name: "牧牧", type: "dog", breed: "边境牧羊犬", age: "1岁9个月", gender: "公", sterilized: false, vaccinated: true, image: "images/牧牧.png", description: "机灵聪明，反应快，互动性极强。", story: "主人没时间饲养退养。", requirements: "空间充足，愿意陪伴运动。", location: "广州天河" },
+{ id: 54, name: "小贝", type: "dog", breed: "边境牧羊犬", age: "2岁2个月", gender: "母", sterilized: true, vaccinated: false, image: "images/小贝.png", description: "性格沉稳懂事，聪明乖巧，不乱跑拆家。", story: "流浪救助后性格变得温顺。", requirements: "补全疫苗，科学喂养。", location: "广州花都" },
+
+// ===== 狗狗：柴犬 =====
+{ id: 55, name: "柴柴", type: "dog", breed: "柴犬", age: "1岁半", gender: "公", sterilized: true, vaccinated: true, image: "images/柴柴.png", description: "性格独立干净，安静不吵闹，长相呆萌。", story: "主人无力饲养退养，习惯良好。", requirements: "能接受独立性格，不弃养。", location: "广州天河" },
+{ id: 56, name: "小柴", type: "dog", breed: "柴犬", age: "1岁4个月", gender: "公", sterilized: false, vaccinated: true, image: "images/小柴.png", description: "呆萌傲娇，爱干净，居家安静省心。", story: "搬家被遗弃，性格稳定。", requirements: "有耐心，适龄绝育。", location: "广州番禺" },
+{ id: 57, name: "柴宝", type: "dog", breed: "柴犬", age: "1岁10个月", gender: "母", sterilized: false, vaccinated: false, image: "images/柴宝.png", description: "长相可爱，性格内敛，认主忠诚。", story: "街边流浪被救助，身体健康。", requirements: "后期补疫苗绝育，不散养。", location: "广州海珠" },
+
+// ===== 狗狗：中华田园犬 =====
+{ id: 58, name: "大黄", type: "dog", breed: "中华田园犬", age: "1岁", gender: "公", sterilized: true, vaccinated: false, image: "images/大黄.png", description: "忠诚护主，体质超好，不挑食超好养活。", story: "街边流浪小狗救助，温顺亲人。", requirements: "不散养不抛弃，愿意补疫苗。", location: "广州海珠" },
+{ id: 59, name: "小黑", type: "dog", breed: "中华田园犬", age: "1岁2个月", gender: "公", sterilized: false, vaccinated: true, image: "images/小黑.png", description: "懂事顾家，听话忠诚，看家能力强。", story: "农村流浪被救助，性格老实。", requirements: "固定住所，适龄绝育。", location: "广州白云" },
+{ id: 60, name: "小花", type: "dog", breed: "中华田园犬", age: "1岁半", gender: "母", sterilized: true, vaccinated: true, image: "images/小花.png", description: "性格温顺亲人，适应力强，特别好养活。", story: "救助站收留，性格乖巧不咬人。", requirements: "不离不弃，接受定期回访。", location: "广州越秀" }
+];
+
+// ================= LocalStorage 封装 =================
+const Storage = {
+getUsers() { return JSON.parse(localStorage.getItem('mc_users') || '[]'); },
+saveUsers(users) { localStorage.setItem('mc_users', JSON.stringify(users)); },
+getCurrentUser() { return JSON.parse(localStorage.getItem('mc_current_user') || 'null'); },
+setCurrentUser(user) { localStorage.setItem('mc_current_user', JSON.stringify(user)); },
+getApplies() { return JSON.parse(localStorage.getItem('mc_applies') || '[]'); },
+saveApplies(applies) { localStorage.setItem('mc_applies', JSON.stringify(applies)); },
+getFavs() { return JSON.parse(localStorage.getItem('mc_favs') || '[]'); },
+saveFavs(favs) { localStorage.setItem('mc_favs', JSON.stringify(favs)); }
+};
+
+// ================= 工具函数 =================
+function getUrlParam(param, search = location.hash) {
+const idx = search.indexOf('?');
+if (idx === -1) return null;
+const qs = new URLSearchParams(search.slice(idx));
+return qs.get(param);
+}
+function checkLogin() { return Storage.getCurrentUser(); }
+function requireLogin() {
+if (!checkLogin()) { showToast("请先登录"); setTimeout(() => location.hash = "login", 1500); return false; }
+return true;
+}
+function logout() {
+Storage.setCurrentUser(null);
+showToast("已退出登录");
+setTimeout(() => location.hash = "home", 800);
+}
+function showToast(msg) {
+let toast = document.getElementById('global-toast');
+if (!toast) {
+toast = document.createElement('div');
+toast.id = 'global-toast';
+toast.className = 'toast';
+document.body.appendChild(toast);
+}
+toast.textContent = msg;
+toast.classList.add('show');
+setTimeout(() => toast.classList.remove('show'), 2500);
+}
+function getPetById(id) { return PET_DATA.find(p => p.id == id); }
+function filterPets({ type, breed, age, gender, sterilized, keyword }) {
+return PET_DATA.filter(p => {
+if (type && p.type !== type) return false;
+if (breed && p.breed !== breed) return false;
+if (gender && p.gender !== gender) return false;
+if (sterilized !== '' && p.sterilized !== (sterilized === 'true')) return false;
+if (keyword && !p.name.includes(keyword) && !p.breed.includes(keyword)) return false;
+if (age) {
+const ageStr = p.age;
+let ageNum = 0;
+if (ageStr.includes('岁')) {
+const parts = ageStr.split('岁');
+ageNum = parseFloat(parts[0]);
+if (parts[1] && parts[1].includes('个月')) { ageNum += parseFloat(parts[1]) / 12; }
+}
+if (age === '幼年' && ageNum >= 1) return false;
+if (age === '成年' && (ageNum < 1 || ageNum > 7)) return false;
+if (age === '老年' && ageNum <= 7) return false;
+}
+return true;
+});
+}
+function ajaxSubmit(data, callback) {
+const btn = document.querySelector('button[type="submit"]');
+const originalText = btn ? btn.innerHTML : '';
+if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 提交中...'; }
+setTimeout(() => {
+if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+callback({ success: true, code: 200, message: "提交成功" });
+}, 900);
+}
+function isFav(petId) {
+return Storage.getFavs().includes(parseInt(petId));
+}
+function toggleFav(petId, event) {
+if (event) event.stopPropagation();
+if (!requireLogin()) return;
+let favs = Storage.getFavs();
+const id = parseInt(petId);
+if (favs.includes(id)) {
+favs = favs.filter(f => f !== id);
+showToast("已取消收藏");
+} else {
+favs.push(id);
+showToast("收藏成功 ❤️");
+}
+Storage.saveFavs(favs);
+updateFavButtons();
+if (document.getElementById('panel-fav').classList.contains('active')) renderFavs();
+}
+function updateFavButtons() {
+document.querySelectorAll('.pet-fav-btn, .detail-fav-btn').forEach(btn => {
+const pid = btn.dataset.petId;
+if (pid) {
+btn.classList.toggle('active', isFav(pid));
+btn.innerHTML = isFav(pid) ? '❤️' : '🤍';
+}
+});
+}
+
+// ================= 导航状态 =================
+function updateNav() {
+const user = Storage.getCurrentUser();
+const loginBox = document.getElementById('nav-login-box');
+const userBox = document.getElementById('nav-user-box');
+if (!loginBox || !userBox) return;
+if (user) {
+loginBox.style.display = 'none';
+userBox.style.display = 'flex';
+userBox.querySelector('.username-display').textContent = user.username;
+} else {
+loginBox.style.display = 'flex';
+userBox.style.display = 'none';
+}
+}
+
+// ================= 路由系统 =================
+function parseHash() {
+const hash = location.hash.slice(1) || 'home';
+const qIdx = hash.indexOf('?');
+const route = qIdx === -1 ? hash : hash.slice(0, qIdx);
+const qs = qIdx === -1 ? '' : hash.slice(qIdx);
+const params = new URLSearchParams(qs);
+return { route, params };
+}
+function showLoader() {
+const loader = document.getElementById('page-loader');
+if (loader) loader.classList.add('show');
+}
+function hideLoader() {
+const loader = document.getElementById('page-loader');
+if (loader) loader.classList.remove('show');
+}
+function renderRoute() {
+showLoader();
+setTimeout(() => {
+const { route, params } = parseHash();
+document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+const target = document.getElementById('page-' + route);
+if (target) {
+target.classList.add('active');
+window.scrollTo(0, 0);
+if (route === 'home') initHome();
+if (route === 'list') initList();
+if (route === 'detail') initDetail(params);
+if (route === 'apply') initApply(params);
+if (route === 'login') initLogin();
+if (route === 'register') initRegister();
+if (route === 'user') initUser();
+} else {
+document.getElementById('page-home').classList.add('active');
+initHome();
+}
+updateNav();
+updateFavButtons();
+hideLoader();
+}, 300);
+}
+window.addEventListener('hashchange', renderRoute);
+
+// ================= 首页逻辑 =================
+let slideTimer;
+function initHome() {
+const container = document.getElementById('hot-pets');
+container.innerHTML = PET_DATA.slice(0, 8).map(pet => `
+<div class="pet-card" onclick="location.hash='detail?id=${pet.id}'">
+<div class="pet-card-img">
+<img src="${pet.image}" alt="${pet.name}">
+<span class="pet-tag">${pet.type === 'dog' ? '🐕 狗狗' : '🐈 猫咪'}</span>
+<button class="pet-fav-btn ${isFav(pet.id) ? 'active' : ''}" data-pet-id="${pet.id}" onclick="toggleFav(${pet.id}, event)">${isFav(pet.id) ? '❤️' : '🤍'}</button>
+</div>
+<div class="pet-card-body">
+<h3>${pet.name} · ${pet.breed}</h3>
+<div class="pet-meta">
+<span>${pet.age}</span><span>${pet.gender}</span><span>${pet.location}</span>
+</div>
+<p class="pet-desc">${pet.description}</p>
+</div>
+</div>
+`).join('');
+if (slideTimer) clearInterval(slideTimer);
+let currentSlide = 0;
+const slides = document.querySelectorAll('.carousel-slide');
+const dots = document.querySelectorAll('.carousel-dot');
+function showSlide(idx) {
+slides.forEach((s, i) => {
+s.classList.toggle('active', i === idx);
+dots[i].classList.toggle('active', i === idx);
+});
+currentSlide = idx;
+}
+window.changeSlide = function(dir) {
+let next = currentSlide + dir;
+if (next < 0) next = slides.length - 1;
+if (next >= slides.length) next = 0;
+showSlide(next);
+};
+window.goToSlide = function(idx) { showSlide(idx); };
+slideTimer = setInterval(() => window.changeSlide(1), 5000);
+document.getElementById('stat-total').textContent = PET_DATA.length;
+document.getElementById('stat-dog').textContent = PET_DATA.filter(p => p.type === 'dog').length;
+document.getElementById('stat-cat').textContent = PET_DATA.filter(p => p.type === 'cat').length;
+document.getElementById('stat-apply').textContent = Storage.getApplies().length;
+document.getElementById('stat-fav').textContent = Storage.getFavs().length;
+}
+function doSearch() {
+const kw = document.getElementById('home-search').value.trim();
+if (!kw) { showToast("请输入搜索内容"); return false; }
+location.hash = `list?keyword=${encodeURIComponent(kw)}`;
+return false;
+}
+function scrollToNotice(e) {
+e.preventDefault();
+location.hash = 'home';
+setTimeout(() => {
+const el = document.getElementById('notice');
+if (el) el.scrollIntoView({ behavior: 'smooth' });
+}, 100);
+}
+
+// ================= 列表页逻辑 =================
+function initList() {
+const urlType = getUrlParam('type');
+const urlKeyword = getUrlParam('keyword');
+if (urlType) document.getElementById('filter-type').value = urlType;
+else document.getElementById('filter-type').value = '';
+if (urlKeyword) document.getElementById('filter-keyword').value = decodeURIComponent(urlKeyword);
+else document.getElementById('filter-keyword').value = '';
+document.getElementById('filter-age').value = '';
+document.getElementById('filter-gender').value = '';
+document.getElementById('filter-sterilized').value = '';
+const breedSet = new Set(PET_DATA.map(p => p.breed));
+const breedSelect = document.getElementById('filter-breed');
+breedSelect.innerHTML = '<option value="">全部品种</option>' + Array.from(breedSet).map(b => `<option value="${b}">${b}</option>`).join('');
+renderList();
+}
+function renderList() {
+const type = document.getElementById('filter-type').value;
+const breed = document.getElementById('filter-breed').value;
+const age = document.getElementById('filter-age').value;
+const gender = document.getElementById('filter-gender').value;
+const sterilized = document.getElementById('filter-sterilized').value;
+const keyword = document.getElementById('filter-keyword').value.trim();
+const result = filterPets({ type, breed, age, gender, sterilized, keyword });
+const container = document.getElementById('pet-list');
+const emptyTip = document.getElementById('empty-tip');
+if (result.length === 0) {
+container.innerHTML = '';
+emptyTip.style.display = 'block';
+return;
+}
+emptyTip.style.display = 'none';
+container.innerHTML = result.map(pet => `
+<div class="pet-card" onclick="location.hash='detail?id=${pet.id}'">
+<div class="pet-card-img">
+<img src="${pet.image}" alt="${pet.name}">
+<span class="pet-tag">${pet.type === 'dog' ? '🐕 狗狗' : '🐈 猫咪'}</span>
+<button class="pet-fav-btn ${isFav(pet.id) ? 'active' : ''}" data-pet-id="${pet.id}" onclick="toggleFav(${pet.id}, event)">${isFav(pet.id) ? '❤️' : '🤍'}</button>
+</div>
+<div class="pet-card-body">
+<h3>${pet.name} · ${pet.breed}</h3>
+<div class="pet-meta">
+<span>${pet.age}</span><span>${pet.gender}</span>
+<span>${pet.sterilized ? '已绝育' : '未绝育'}</span>
+<span>${pet.vaccinated ? '已疫苗' : '未疫苗'}</span>
+</div>
+<p class="pet-desc">${pet.description}</p>
+</div>
+</div>
+`).join('');
+}
+function resetFilter() {
+document.getElementById('filter-type').value = '';
+document.getElementById('filter-breed').value = '';
+document.getElementById('filter-age').value = '';
+document.getElementById('filter-gender').value = '';
+document.getElementById('filter-sterilized').value = '';
+document.getElementById('filter-keyword').value = '';
+renderList();
+}
+
+// ================= 详情页逻辑 =================
+function initDetail(params) {
+const petId = params.get('id');
+const pet = getPetById(petId);
+const box = document.getElementById('detail-box');
+if (!pet) {
+box.innerHTML = '<div style="text-align:center;padding:80px 20px;"><h2>宠物不存在</h2><a href="#list" class="btn btn-primary" style="margin-top:20px;">返回列表</a></div>';
+return;
+}
+box.innerHTML = `
+<div class="detail-img">
+<img src="${pet.image}" alt="${pet.name}">
+<button class="detail-fav-btn ${isFav(pet.id) ? 'active' : ''}" data-pet-id="${pet.id}" onclick="toggleFav(${pet.id}, event)">${isFav(pet.id) ? '❤️' : '🤍'}</button>
+</div>
+<div class="detail-info">
+<h1>${pet.name} <span style="font-size:18px;color:#999;font-weight:normal;">| ${pet.breed}</span></h1>
+<div class="detail-tags">
+<span class="detail-tag">${pet.type === 'dog' ? '🐕 狗狗' : '🐈 猫咪'}</span>
+<span class="detail-tag">${pet.age}</span>
+<span class="detail-tag">${pet.gender}</span>
+<span class="detail-tag">${pet.sterilized ? '✅ 已绝育' : '未绝育'}</span>
+<span class="detail-tag">${pet.vaccinated ? '✅ 已疫苗' : '未疫苗'}</span>
+<span class="detail-tag">📍 ${pet.location}</span>
+</div>
+<div class="detail-section"><h3>宠物介绍</h3><p>${pet.description}</p></div>
+<div class="detail-section"><h3>救助故事</h3><p>${pet.story}</p></div>
+<div class="detail-section"><h3>领养要求</h3><p>${pet.requirements}</p></div>
+<div class="detail-actions">
+<a href="#apply?id=${pet.id}" class="btn btn-primary" style="padding:12px 40px;font-size:16px;">❤️ 我要领养</a>
+<a href="#list" class="btn btn-outline" style="padding:12px 40px;font-size:16px;">返回列表</a>
+</div>
+</div>
+`;
+}
+
+// ================= 登录逻辑 =================
+function initLogin() {
+document.getElementById('username').value = '';
+document.getElementById('password').value = '';
+document.getElementById('fg-user').classList.remove('error');
+document.getElementById('fg-pwd').classList.remove('error');
+}
+function handleLogin() {
+const user = document.getElementById('username').value.trim();
+const pwd = document.getElementById('password').value.trim();
+document.getElementById('fg-user').classList.remove('error');
+document.getElementById('fg-pwd').classList.remove('error');
+let valid = true;
+if (!user) { document.getElementById('fg-user').classList.add('error'); valid = false; }
+if (!pwd || pwd.length < 6) { document.getElementById('fg-pwd').classList.add('error'); valid = false; }
+if (!valid) return false;
+const users = Storage.getUsers();
+const found = users.find(u => u.username === user && u.password === pwd);
+if (!found) { showToast("用户名或密码错误"); return false; }
+Storage.setCurrentUser(found);
+showToast("登录成功，欢迎回来！");
+setTimeout(() => location.hash = 'home', 1000);
+return false;
+}
+
+// ================= 注册逻辑 =================
+function initRegister() {
+['reg-user','reg-pwd','reg-pwd2','reg-phone'].forEach(id => { document.getElementById(id).value = ''; });
+['fg-reg-user','fg-reg-pwd','fg-reg-pwd2','fg-reg-phone'].forEach(id => { document.getElementById(id).classList.remove('error'); });
+}
+function handleRegister() {
+const user = document.getElementById('reg-user').value.trim();
+const pwd = document.getElementById('reg-pwd').value.trim();
+const pwd2 = document.getElementById('reg-pwd2').value.trim();
+const phone = document.getElementById('reg-phone').value.trim();
+const phoneReg = /^1[3-9]\d{9}$/;
+['fg-reg-user','fg-reg-pwd','fg-reg-pwd2','fg-reg-phone'].forEach(id => { document.getElementById(id).classList.remove('error'); });
+let valid = true;
+if (!user || !/^[a-zA-Z0-9一-龥]{2,16}$/.test(user)) { document.getElementById('fg-reg-user').classList.add('error'); valid = false; }
+if (!pwd || pwd.length < 6) { document.getElementById('fg-reg-pwd').classList.add('error'); valid = false; }
+if (pwd !== pwd2) { document.getElementById('fg-reg-pwd2').classList.add('error'); valid = false; }
+if (!phoneReg.test(phone)) { document.getElementById('fg-reg-phone').classList.add('error'); valid = false; }
+if (!valid) return false;
+const users = Storage.getUsers();
+if (users.some(u => u.username === user)) { showToast("该用户名已被注册"); return false; }
+users.push({ username: user, password: pwd, phone: phone, createTime: new Date().toLocaleString() });
+Storage.saveUsers(users);
+showToast("注册成功，请登录");
+setTimeout(() => location.hash = 'login', 1200);
+return false;
+}
+
+// ================= 申请页逻辑 =================
+let currentApplyPet = null;
+function initApply(params) {
+const petId = params.get('id');
+const pet = getPetById(petId);
+currentApplyPet = pet;
+const bar = document.getElementById('pet-info-bar');
+if (!pet) {
+bar.innerHTML = '<div style="color:#c0392b;">宠物不存在</div>';
+return;
+}
+bar.innerHTML = `
+<img src="${pet.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;">
+<div>
+<div style="font-weight:600;">${pet.name} · ${pet.breed}</div>
+<div style="font-size:13px;color:#666;">${pet.age} | ${pet.gender} | ${pet.location}</div>
+</div>
+`;
+document.getElementById('applyForm').reset();
+['fg-name','fg-phone','fg-address','fg-job','fg-house','fg-exp','fg-reason'].forEach(id => { document.getElementById(id).classList.remove('error'); });
+}
+function handleApply() {
+if (!requireLogin()) return false;
+if (!currentApplyPet) { showToast("宠物信息有误"); return false; }
+const name = document.getElementById('a-name').value.trim();
+const phone = document.getElementById('a-phone').value.trim();
+const address = document.getElementById('a-address').value.trim();
+const job = document.getElementById('a-job').value;
+const house = document.getElementById('a-house').value;
+const exp = document.getElementById('a-exp').value;
+const reason = document.getElementById('a-reason').value.trim();
+const phoneReg = /^1[3-9]\d{9}$/;
+['fg-name','fg-phone','fg-address','fg-job','fg-house','fg-exp','fg-reason'].forEach(id => { document.getElementById(id).classList.remove('error'); });
+let valid = true;
+if (!name) { document.getElementById('fg-name').classList.add('error'); valid = false; }
+if (!phoneReg.test(phone)) { document.getElementById('fg-phone').classList.add('error'); valid = false; }
+if (!address) { document.getElementById('fg-address').classList.add('error'); valid = false; }
+if (!job) { document.getElementById('fg-job').classList.add('error'); valid = false; }
+if (!house) { document.getElementById('fg-house').classList.add('error'); valid = false; }
+if (!exp) { document.getElementById('fg-exp').classList.add('error'); valid = false; }
+if (!reason || reason.length < 10) { document.getElementById('fg-reason').classList.add('error'); valid = false; }
+if (!valid) return false;
+const user = checkLogin();
+const applyData = {
+id: Date.now(),
+petId: currentApplyPet.id,
+petName: currentApplyPet.name,
+petImage: currentApplyPet.image,
+petBreed: currentApplyPet.breed,
+applicant: user.username,
+name, phone, address, job, house, exp, reason,
+status: 'pending',
+createTime: new Date().toLocaleString()
+};
+ajaxSubmit(applyData, (res) => {
+if (res.success) {
+const applies = Storage.getApplies();
+applies.push(applyData);
+Storage.saveApplies(applies);
+showToast("申请提交成功！");
+setTimeout(() => location.hash = 'user', 1200);
+}
+});
+return false;
+}
+
+// ================= 个人中心逻辑 =================
+function initUser() {
+const user = checkLogin();
+if (!user) { location.hash = 'login'; return; }
+document.getElementById('user-welcome').textContent = `欢迎回来，${user.username} | 手机号：${user.phone || '未绑定'}`;
+renderApplies();
+renderFavs();
+}
+function switchTab(tab) {
+document.querySelectorAll('.user-tab').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.user-tab-panel').forEach(p => p.classList.remove('active'));
+document.getElementById('tab-' + tab).classList.add('active');
+document.getElementById('panel-' + tab).classList.add('active');
+}
+function renderApplies() {
+const user = checkLogin();
+const list = Storage.getApplies().filter(a => a.applicant === user.username);
+const container = document.getElementById('apply-list');
+if (list.length === 0) {
+container.innerHTML = `
+<div class="empty-state">
+<<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 12V8H4v4m0 0v8h16v-8M4 12l2.5-2.5M20 12l-2.5-2.5M9 12h6"/></svg>
+<p>暂无领养申请</p>
+<p><a href="#list" class="btn btn-primary btn-sm" style="margin-top:10px;">去领养宠物</a></p>
+</div>
+`;
+return;
+}
+container.innerHTML = list.map(item => {
+const statusText = item.status === 'pending' ? '⏳ 待审核' : '✅ 已通过';
+const statusClass = item.status === 'pending' ? 'status-pending' : 'status-approved';
+return `
+<div class="apply-item">
+<img src="${item.petImage}" alt="${item.petName}">
+<div class="apply-info">
+<h4>${item.petName} · ${item.petBreed}</h4>
+<p>申请时间：${item.createTime}</p>
+<p>居住地址：${item.address}</p>
+</div>
+<span class="apply-status ${statusClass}">${statusText}</span>
+<button class="btn btn-danger btn-sm" onclick="cancelApply(${item.id})">取消申请</button>
+</div>
+`;}).join('');
+}
+function renderFavs() {
+const favIds = Storage.getFavs();
+const container = document.getElementById('fav-list');
+if (favIds.length === 0) {
+container.innerHTML = `
+<div class="empty-state">
+<<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+<p>暂无收藏的宠物</p>
+<p><a href="#list" class="btn btn-primary btn-sm" style="margin-top:10px;">去发现萌宠</a></p>
+</div>
+`;
+return;
+}
+const favPets = favIds.map(id => getPetById(id)).filter(Boolean);
+container.innerHTML = `<div class="fav-grid">` + favPets.map(pet => `
+<div class="fav-card">
+<button class="fav-remove" onclick="removeFav(${pet.id})">×</button>
+<img src="${pet.image}" alt="${pet.name}" onclick="location.hash='detail?id=${pet.id}'" style="cursor:pointer;">
+<div class="fav-card-body">
+<h4>${pet.name}</h4>
+<p>${pet.breed} · ${pet.age} · ${pet.gender}</p>
+<a href="#apply?id=${pet.id}" class="btn btn-primary btn-sm" style="margin-top:8px;">申请领养</a>
+</div>
+</div>
+`).join('') + `</div>`;
+}
+function removeFav(id) {
+let favs = Storage.getFavs().filter(f => f !== id);
+Storage.saveFavs(favs);
+showToast("已从收藏移除");
+renderFavs();
+updateFavButtons();
+}
+function cancelApply(id) {
+if (!confirm('确定要取消这条领养申请吗？')) return;
+let applies = Storage.getApplies();
+applies = applies.filter(a => a.id !== id);
+Storage.saveApplies(applies);
+showToast("已取消申请");
+renderApplies();
+}
+
+// ================= 初始化 =================
+document.addEventListener('DOMContentLoaded', () => {
+renderRoute();
+});
+</script>
+</body>
+</html>
